@@ -13,7 +13,11 @@ export class AuthService {
         if (user?.password !== pass) {
             throw new UnauthorizedException();
         }
-        const payload = {sub: user.userId, username: user.userName};
+        const payload = {
+            sub: user._id, 
+            username: user.username,
+            roles: user.roles
+        };
         // use bcrypt for hashing passwords
 
         // generat JWT Token and return token

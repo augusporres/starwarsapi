@@ -2,12 +2,14 @@ import { Controller, Post, Param, Body } from '@nestjs/common';
 import { ApiOperation, ApiTags, ApiParam, ApiResponse, ApiProperty, ApiBody } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
+import { Public } from 'src/auth/constants';
 
 @ApiTags('Users')
 @Controller('user')
 export class UserController {
     constructor(){}
 
+    @Public()
     @ApiOperation({summary: 'register new user'})
     @ApiResponse({status: 200, description: 'The created user', type: String})
     @ApiBody({type: CreateUserDto})

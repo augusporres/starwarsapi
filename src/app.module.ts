@@ -8,10 +8,19 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
 import { AuthService } from './auth/auth.service';
+import { MovieService } from './movie/movie.service';
+import { MongooseModule } from '@nestjs/mongoose'
 
+// import {dotenv} from 'dotenv'
+import { MovieModule } from './movie/movie.module';
+import { ConfigModule } from '@nestjs/config';
 @Module({
-  imports: [AuthModule, UserModule, AuthModule],
-  controllers: [AppController, UserController, MovieController, AuthController],
+  imports: [
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.DB_HOST),
+    AuthModule, UserModule,  MovieModule
+  ],
+  controllers: [AppController, UserController,  AuthController, MovieController],
   providers: [AppService, UserService, AuthService],
 })
 export class AppModule {}
