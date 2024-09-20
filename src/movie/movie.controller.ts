@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { Movie } from './interfaces/movie.interface';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public, Roles } from 'src/auth/constants';
 import { GetMovieDto } from './dto/get-movie.dto';
+import { GetMovieDetailDto } from './dto/get-movie-detail.dto';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -34,5 +35,15 @@ export class MovieController {
     @Get('update')
     async updateMovies() {
         return this.movieService.updateFromApi();
+    }
+
+    
+    @Roles('user')
+    @ApiOperation({summary: 'Get specific movie details'})
+    @ApiBearerAuth('access-token')
+    @ApiResponse({status: 200, description: 'The queried movie details', type: GetMovieDetailDto})
+    @Get(':title')
+    async getMovieByTitle(@Param('title') title: string) {
+        return this.movieService.findByTitle(title);
     }
 }

@@ -16,6 +16,9 @@ export class MovieService {
     async findAll(): Promise<Movie[]> {
         return this.movieModel.find().exec();
     }
+    async findByTitle(title: string): Promise<Movie> {
+        return this.movieModel.findOne({title}).exec();
+    }
 
     async create(movie: Movie): Promise<Movie> {
         const newMovie = new this.movieModel(movie);
@@ -31,7 +34,7 @@ export class MovieService {
                 openningCrawl: movie.opening_crawl,
                 director: movie.director
             }))
-            console.log('moviees', data);
+            console.log('movies', data);
             return data;
         } catch (error) {
             console.error('Error fetching movies', error);
