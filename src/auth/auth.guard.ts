@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { IS_PUBLIC_KEY, jwtConstants } from "./constants";
 import { Request } from 'express';
@@ -21,6 +21,7 @@ export class AuthGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const token = this.extractTokenFromHeader(request);
         if (!token) {
+            console.log('perdiste, fallo el token')
             throw new UnauthorizedException();
         }
         try {
@@ -33,6 +34,15 @@ export class AuthGuard implements CanActivate {
             // assigning payload to request object so that we can
             // access it on our route handlers
             request['user'] = payload;
+
+            const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+            console.log('roles', requiredRoles)
+            if (requiredRoles && requiredRoles.length) {
+                const hasRole = () => payload.roles.some((role) => requiredRoles.includes(role));
+                if (!hasRole())  {
+                    throw new ForbiddenException('Not permitted for user');
+                }
+            }
         } catch {
             throw new UnauthorizedException();
         }
@@ -42,6 +52,6 @@ export class AuthGuard implements CanActivate {
 
     private extractTokenFromHeader(request: Request): string | undefined {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
-        return type === 'Bearear' ? token: undefined;
+        return type === 'Bearer' ? token: undefined;
     }
 }

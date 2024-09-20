@@ -1,9 +1,11 @@
 import { Body, Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserDto } from 'src/user/dto/user.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './auth.guard';
 import { Public } from './constants';
+import { NewUserDto } from './dto/new-user.dto';
+import { User } from 'src/user/schemas/user.schema';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,5 +24,17 @@ export class AuthController {
     @Get('profile')
     getProfile(@Request() req) {
         return req.user
+    }
+    
+    @Public()
+    @ApiOperation({summary: 'register new user'})
+    @ApiResponse({status: 200, description: 'The created user', type: User})
+    @ApiBody({type: NewUserDto})
+    @Post('register')
+    async registerUser(@Body() newUserDto: NewUserDto & {roles?: string[]}) {
+        if (!newUserDto.roles || newUserDto.roles.length === 0){
+            newUserDto.roles = ['user'];
+        }
+        return this.authService.create(newUserDto)
     }
 }

@@ -8,7 +8,6 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { UserService } from './user/user.service';
 import { AuthService } from './auth/auth.service';
-import { MovieService } from './movie/movie.service';
 import { MongooseModule } from '@nestjs/mongoose'
 
 // import {dotenv} from 'dotenv'
@@ -21,6 +20,6 @@ import { ConfigModule } from '@nestjs/config';
     AuthModule, UserModule,  MovieModule
   ],
   controllers: [AppController, UserController,  AuthController, MovieController],
-  providers: [AppService, UserService, AuthService],
+  providers: [AppService],
 })
 export class AppModule {}
