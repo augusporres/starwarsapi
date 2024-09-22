@@ -6,7 +6,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
-import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -15,8 +14,7 @@ import { UserService } from 'src/user/user.service';
         global: true, // for not having to import it in every module
         secret: jwtConstants.secret,
         signOptions: {expiresIn: '60s'}
-      }),
-
+      })
     ],
   providers: [
     {
