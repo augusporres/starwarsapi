@@ -6,4 +6,8 @@ export class GetMovieDto {
     title: string;
     @ApiProperty({example: '4', description: 'The episode number'})
     episodeId: number;
+    @ApiProperty({example: 'George Lucas', description: 'The movie director'})
+    director: string;
+    @ApiProperty({example: '1977-12-05', description: 'The release date of the movie'})
+    releaseDate: number;
 }
