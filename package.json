@@ -34,6 +34,7 @@
     "dotenv": "^16.4.5",
     "mongoose": "^8.6.3",
     "mysql2": "^3.11.3",
+    "pg": "^8.13.0",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
