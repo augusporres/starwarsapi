@@ -1,34 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { User } from './schemas/user.schema';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { NewUserDto } from 'src/auth/dto/new-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { FindOneOptions, Repository } from 'typeorm';
+import { Role } from 'src/auth/entities/role-entity';
 
 
 @Injectable()
 export class UserService {
 
-    constructor(@InjectModel(User.name) private userModel: Model<User>){}
+    constructor(
+        @InjectRepository(User) private userRepository: Repository<User>,
+        @InjectRepository(Role) private roleRepository: Repository<Role>
+    ){}
     
-    // async create(createUserDto: CreateUserDto): Promise<User> {
-    //     const createdUser = new this.userModel(createUserDto);
-    //     return createdUser.save();
-    // }
-
-    async findOne(username: string): Promise<User | undefined> {
-        return await this.userModel.findOne({username}).exec();
+    async findOne(username: string, options?: FindOneOptions<User>): Promise<User | undefined> {
+        return await this.userRepository.findOne({
+            where: { username },
+            ...options
+        });
     }
 
     async create(newUserDto: NewUserDto): Promise<User> {
-        // const hashedPassword = await bcrypt.hash(newUserDto.password, 10);
 
-        const newUser = new this.userModel({
-            username: newUserDto.username,
-            password: newUserDto.password,
-            roles: newUserDto.roles
-        });
-        return newUser.save();
+        newUserDto.password = await bcrypt.hash(newUserDto.password, 10);
+        
+        
+        const userRole = await this.roleRepository.findOne({
+            where: { role: 'user' },
+          });
+        let user = this.userRepository.create({
+            ...newUserDto,
+            roles: [userRole]
+          });
+        user = await this.userRepository.save(user);
+        delete user.password;
+        return user;
     }
     
 }
