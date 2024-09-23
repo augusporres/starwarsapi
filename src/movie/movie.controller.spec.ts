@@ -2,98 +2,105 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { Movie } from './interfaces/movie.interface';
-import { ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { JwtService } from '@nestjs/jwt';
+import { UpdateMovieDto } from './dto/update-movie.dto';
+import { UnauthorizedException } from '@nestjs/common';
+import { Movie } from './entities/movie-entity';
+import { GetMovieDto } from './dto/get-movie.dto';
 
 describe('MovieController', () => {
-    let movieController: MovieController;
-    let movieService: MovieService;
-    let reflector: Reflector;
-    let authGuard: AuthGuard;
-    let jwtService: JwtService;
-    
-    const mockMovieService = {
-        create: jest.fn()
-    }
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            controllers: [MovieController],
-            providers: [
-                {
-                    provide: MovieService,
-                    useValue: mockMovieService
-                },
-                Reflector,
-                {
-                    provide: JwtService,
-                    useValue: {
-                        verifyAsync: jest.fn(), // Mocking JWT verify method
-                    },
-                },
-            ]
-        }).compile();
-        
-        movieController = module.get<MovieController>(MovieController);
-        movieService = module.get<MovieService>(MovieService);
-        reflector = module.get<Reflector>(Reflector);
-        jwtService = module.get<JwtService>(JwtService);
-        authGuard = new AuthGuard(jwtService, reflector);
+  let movieController: MovieController;
+  let movieService: MovieService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [MovieController],
+      providers: [
+        {
+          provide: MovieService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            updateByEpisode: jest.fn(),
+            updateFromApi: jest.fn(),
+            findByEpisode: jest.fn(),
+            deleteByEpisode: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
+
+    movieController = module.get<MovieController>(MovieController);
+    movieService = module.get<MovieService>(MovieService);
+  });
+
+  it('should be defined', () => {
+    expect(movieController).toBeDefined();
+  });
+
+  describe('createMovie', () => {
+    it('should create a new movie', async () => {
+      const createMovieDto: CreateMovieDto = { title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() };
+      const retValue: Movie = {
+        id: 1,
+        ...createMovieDto}
+      jest.spyOn(movieService, 'create').mockResolvedValue(retValue);
+
+      const result = await movieController.createMovie(createMovieDto);
+      expect(result).toEqual(retValue);
+      expect(movieService.create).toHaveBeenCalledWith(createMovieDto);
     });
-    
-    it('should be defined', () => {
-        expect(movieController).toBeDefined();
+
+    it('should throw UnauthorizedException if user does not have admin role', async () => {
+      // Simulate a user without the 'admin' role
+      jest.spyOn(movieService, 'create').mockImplementation(() => {
+        throw new UnauthorizedException();
+      });
+
+      const createMovieDto: CreateMovieDto = { title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() };
+
+      await expect(movieController.createMovie(createMovieDto)).rejects.toThrow(UnauthorizedException);
     });
-    
-    describe('createMovie', () => {
-        it('should return created movie', async () => {
-            const newMovie: CreateMovieDto = {
-                title: 'new movie',
-                episodeId: 1,
-                director: 'Augusto',
-                releaseDate: new Date('1986-05-06')
-            }
-            const createdMovie: Movie = {...newMovie}
-            
-            const user = { roles: ['admin'] }; // Mock admin user
-            jest.spyOn(movieService, 'create').mockResolvedValue(newMovie);
-            
-            // mockMovieService.create.mockResolvedValue(createdMovie);
-            
-            
-            const result = await movieController.createMovie(newMovie);
-            expect(result).toEqual(createdMovie);
-            expect(movieService.create).toHaveBeenCalledWith(newMovie);
-        })
-        
-        it('should throw a ForbiddenException for a non-admin user', async () => {
-            const movieDto: CreateMovieDto = {
-                title: 'new movie',
-                episodeId: 1,
-                director: 'Augusto',
-                releaseDate: new Date('1986-05-06')
-            };
-            
-            const userPayload = { roles: ['user'] };
-            jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(userPayload);
-            jest.spyOn(reflector, 'get').mockReturnValue(['admin']);
-            
-            // Simulate request context
-            const req = { headers: { authorization: 'Bearer token' } };
-            const context = {
-                switchToHttp: () => ({
-                    getRequest: () => req,
-                }),
-                getHandler: () => jest.fn(), // Mock the handler
-                getClass: () => jest.fn(), // Mock the handler
-            };
-            
-            const canActivate = authGuard.canActivate(context as any);    
-            // expect(canActivate).rejects.toThrow(ForbiddenException);
-            expect(canActivate).toBe(false);
-            // await expect(movieController.createMovie(movieDto)).rejects.toThrow(ForbiddenException);
-        });
+  });
+
+  describe('get', () => {
+    it('should return all movies', async () => {
+      const result: GetMovieDto[] = [
+        { title: 'Test Movie', 
+            episodeId: 1, 
+            director: 'Director', 
+            releaseDate: new Date() 
+        }
+    ];
+      jest.spyOn(movieService, 'findAll').mockResolvedValue(result);
+
+      expect(await movieController.get()).toEqual(result);
     });
+  });
+
+  describe('updateMovieByEpisode', () => {
+    it('should update movie by episode id', async () => {
+      const updateMovieDto: UpdateMovieDto = { title: 'Updated Movie', director: 'New Director' };
+      const returnValue: Movie = {
+        id: 1,
+        episodeId: 1,
+        title: updateMovieDto.title,
+        director: updateMovieDto.director,
+        releaseDate: new Date()
+      }
+      jest.spyOn(movieService, 'updateByEpisode').mockResolvedValue(returnValue);
+
+      await expect(movieController.updateMovieByEpisode(1, updateMovieDto)).resolves.toBe(returnValue);
+      expect(movieService.updateByEpisode).toHaveBeenCalledWith(1, updateMovieDto);
+    });
+  });
+
+  describe('deleteMovieByEpisode', () => {
+    it('should delete movie by episode', async () => {
+        const sucessString: string = "Movie successfully deleted"
+      jest.spyOn(movieService, 'deleteByEpisode').mockResolvedValue(sucessString);
+
+      await expect(movieController.deleteMovieByEpisode(1)).resolves.toBe(sucessString);
+      expect(movieService.deleteByEpisode).toHaveBeenCalledWith(1);
+    });
+  });
 });

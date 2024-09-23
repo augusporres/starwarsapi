@@ -5,8 +5,8 @@ export class GetMovieDetailDto {
     title: string;
     @ApiProperty({example: '4', description: 'The episode number'})
     episodeId: number;
-    @ApiProperty({example: 'It is a period of civil war...', description: 'The openinc phrase'})
-    opening_crawl: string;
     @ApiProperty({example: 'Robert D Jr', description: 'The director of the movie'})
     director: string;
+    @ApiProperty({example: '1977-05-06', description: 'The release date of the movie'})
+    releaseDate: Date;
 }

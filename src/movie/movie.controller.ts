@@ -7,6 +7,7 @@ import { Public, Roles } from 'src/auth/constants';
 import { GetMovieDto } from './dto/get-movie.dto';
 import { GetMovieDetailDto } from './dto/get-movie-detail.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
+import { GetMovieFromApiDto } from './dto/get-movie-from-api.dto';
 
 @ApiTags('Movies')
 @Controller('movies')
@@ -42,7 +43,7 @@ export class MovieController {
     async updateMovieByEpisode(
         @Param('episode') episode: number,
         @Body() updateMovieDto: UpdateMovieDto
-    ) {
+    ): Promise<UpdateMovieDto> {
         return this.movieService.updateByEpisode(episode, updateMovieDto);
     }
     @Roles('admin')
@@ -51,7 +52,7 @@ export class MovieController {
     @ApiResponse({status: 401, description: 'Not authorized for this method'})
     @ApiBearerAuth('access-token')  
     @Get('updateFromApi')
-    async updateMovies() {
+    async updateMovies(): Promise<GetMovieFromApiDto[]>{
         return this.movieService.updateFromApi();
     }
 
@@ -61,7 +62,7 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     @ApiResponse({status: 200, description: 'The queried movie details', type: GetMovieDetailDto})
     @Get(':episode')
-    async getMovieByTitle(@Param('episode') episode: number) {
+    async getMovieByTitle(@Param('episode') episode: number): Promise<GetMovieDetailDto> {
         return this.movieService.findByEpisode(episode);
         
     }
@@ -71,7 +72,7 @@ export class MovieController {
     @ApiBearerAuth('access-token')
     @ApiResponse({status: 200, description: 'The movie was deleted successfully'})
     @Delete(':episode')
-    async deleteMovieByEpisode(@Param('episode') episode: number) {
+    async deleteMovieByEpisode(@Param('episode') episode: number): Promise<string> {
         return this.movieService.deleteByEpisode(episode);
         
     }

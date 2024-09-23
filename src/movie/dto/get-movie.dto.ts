@@ -9,5 +9,5 @@ export class GetMovieDto {
     @ApiProperty({example: 'George Lucas', description: 'The movie director'})
     director: string;
     @ApiProperty({example: '1977-12-05', description: 'The release date of the movie'})
-    releaseDate: number;
+    releaseDate: Date;
 }
