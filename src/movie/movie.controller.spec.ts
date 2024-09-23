@@ -20,10 +20,10 @@ describe('MovieController', () => {
           useValue: {
             create: jest.fn(),
             findAll: jest.fn(),
-            updateByEpisode: jest.fn(),
+            updateById: jest.fn(),
             updateFromApi: jest.fn(),
-            findByEpisode: jest.fn(),
-            deleteByEpisode: jest.fn(),
+            findById: jest.fn(),
+            deleteById: jest.fn(),
           },
         },
       ],
@@ -65,7 +65,9 @@ describe('MovieController', () => {
   describe('get', () => {
     it('should return all movies', async () => {
       const result: GetMovieDto[] = [
-        { title: 'Test Movie', 
+        { 
+            id: 1,
+            title: 'Test Movie', 
             episodeId: 1, 
             director: 'Director', 
             releaseDate: new Date() 
@@ -77,30 +79,33 @@ describe('MovieController', () => {
     });
   });
 
-  describe('updateMovieByEpisode', () => {
-    it('should update movie by episode id', async () => {
-      const updateMovieDto: UpdateMovieDto = { title: 'Updated Movie', director: 'New Director' };
-      const returnValue: Movie = {
-        id: 1,
+  describe('updateMovieById', () => {
+    it('should update movie by id', async () => {
+      const updateMovieDto: UpdateMovieDto = { 
+        title: 'Updated Movie', 
+        director: 'New Director',
+        episodeId: 1
+    };
+      const returnValue: UpdateMovieDto = {
         episodeId: 1,
         title: updateMovieDto.title,
         director: updateMovieDto.director,
         releaseDate: new Date()
       }
-      jest.spyOn(movieService, 'updateByEpisode').mockResolvedValue(returnValue);
+      jest.spyOn(movieService, 'updateById').mockResolvedValue(returnValue);
 
-      await expect(movieController.updateMovieByEpisode(1, updateMovieDto)).resolves.toBe(returnValue);
-      expect(movieService.updateByEpisode).toHaveBeenCalledWith(1, updateMovieDto);
+      await expect(movieController.updateMovieById(1, updateMovieDto)).resolves.toBe(returnValue);
+      expect(movieService.updateById).toHaveBeenCalledWith(1, updateMovieDto);
     });
   });
 
-  describe('deleteMovieByEpisode', () => {
-    it('should delete movie by episode', async () => {
+  describe('deleteMovieById', () => {
+    it('should delete movie by id', async () => {
         const sucessString: string = "Movie successfully deleted"
-      jest.spyOn(movieService, 'deleteByEpisode').mockResolvedValue(sucessString);
+      jest.spyOn(movieService, 'deleteById').mockResolvedValue(sucessString);
 
-      await expect(movieController.deleteMovieByEpisode(1)).resolves.toBe(sucessString);
-      expect(movieService.deleteByEpisode).toHaveBeenCalledWith(1);
+      await expect(movieController.deleteMovieById(1)).resolves.toBe(sucessString);
+      expect(movieService.deleteById).toHaveBeenCalledWith(1);
     });
   });
 });

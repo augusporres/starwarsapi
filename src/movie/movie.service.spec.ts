@@ -55,26 +55,26 @@ describe('MovieService', () => {
   describe('findAll', () => {
     it('should return an array of movies', async () => {
       const result: Movie[] = [{ id: 1,title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() }];
-      const serviceResult: GetMovieDto[] = [{ title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() }]
+      const serviceResult: GetMovieDto[] = [{ id: 1, title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() }]
       jest.spyOn(movieRepository, 'find').mockResolvedValue(result);
 
       expect(await movieService.findAll()).toEqual(serviceResult);
     });
   });
 
-  describe('findByEpisode', () => {
-    it('should return a movie by episode', async () => {
+  describe('findById', () => {
+    it('should return a movie by id', async () => {
       const movie: Movie = { id: 1, title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date() };
-      const serviceResp: GetMovieDetailDto = {title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date()}
+      const serviceResp: GetMovieDetailDto = {id: 1,title: 'Test Movie', episodeId: 1, director: 'Director', releaseDate: new Date()}
       jest.spyOn(movieRepository, 'findOneBy').mockResolvedValue(movie);
 
-      expect(await movieService.findByEpisode(1)).toEqual(serviceResp);
+      expect(await movieService.findById(1)).toEqual(serviceResp);
     });
 
     it('should throw NotFoundException if movie does not exist', async () => {
       jest.spyOn(movieRepository, 'findOneBy').mockResolvedValue(null);
 
-      await expect(movieService.findByEpisode(1)).rejects.toThrow(NotFoundException);
+      await expect(movieService.findById(1)).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -122,13 +122,13 @@ describe('MovieService', () => {
     });
   });
 
-  describe('updateByEpisode', () => {
-    it('should update a movie by episode', async () => {
-      const episode = 1;
+  describe('updateById', () => {
+    it('should update a movie by id', async () => {
+      const id = 1;
       const updateMovieDto: UpdateMovieDto = { title: 'Updated Movie', director: 'Updated Director' };
       const movieFromDb: Movie = { 
-          id: 1, 
-          episodeId: episode, 
+          id: id, 
+          episodeId: id, 
           releaseDate: new Date(),
           title: updateMovieDto.title,
           director: updateMovieDto.director
@@ -137,28 +137,28 @@ describe('MovieService', () => {
       jest.spyOn(movieRepository, 'findOneBy').mockResolvedValue(movieFromDb);
       jest.spyOn(movieRepository, 'save').mockResolvedValue(movieFromDb);
         delete movieFromDb.id
-      expect(await movieService.updateByEpisode(episode, updateMovieDto)).toEqual(movieFromDb);
+      expect(await movieService.updateById(id, updateMovieDto)).toEqual(movieFromDb);
     });
 
     it('should throw NotFoundException if movie does not exist', async () => {
       jest.spyOn(movieRepository, 'findOneBy').mockResolvedValue(null);
 
-      await expect(movieService.updateByEpisode(1, {})).rejects.toThrow(NotFoundException);
+      await expect(movieService.updateById(1, {})).rejects.toThrow(NotFoundException);
     });
   });
 
-  describe('deleteByEpisode', () => {
-    it('should delete a movie by episode', async () => {
+  describe('deleteById', () => {
+    it('should delete a movie by id', async () => {
         
       jest.spyOn(movieRepository, 'delete').mockResolvedValue({ affected: 1, raw: {} });
 
-      await expect(movieService.deleteByEpisode(1)).resolves.toEqual("Movie successfully deleted");
+      await expect(movieService.deleteById(1)).resolves.toEqual("Movie successfully deleted");
     });
 
     it('should throw NotFoundException if movie does not exist', async () => {
       jest.spyOn(movieRepository, 'delete').mockResolvedValue({ affected: 0, raw: {} });
 
-      await expect(movieService.deleteByEpisode(1)).rejects.toThrow(NotFoundException);
+      await expect(movieService.deleteById(1)).rejects.toThrow(NotFoundException);
     });
   });
 });
