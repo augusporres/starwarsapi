@@ -5,6 +5,4 @@ export class NewUserDto {
     username: string;
     @ApiProperty({example: '*****', description: 'Your password'})
     password: string;
-    @ApiProperty({example: '[admin, user]', description: 'Roles for the user'})
-    roles?: string[];
 }

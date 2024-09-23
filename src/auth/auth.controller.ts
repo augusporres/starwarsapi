@@ -5,8 +5,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from './auth.guard';
 import { Public } from './constants';
 import { NewUserDto } from './dto/new-user.dto';
-import { User } from 'src/user/schemas/user.schema';
-
+import { User } from 'src/user/entities/user.entity';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -16,14 +15,11 @@ export class AuthController {
     @Public()
     @Post('login')
     @ApiBody({type: UserDto})
-    signIn(@Body() signInDto: UserDto) {
+    signIn(@Body() signInDto: UserDto):  Promise<{
+        user: User;
+        access_token: string;
+    }> {
         return this.authService.signIn(signInDto.username, signInDto.password);
-    }
-
-    @UseGuards(AuthGuard)
-    @Get('profile')
-    getProfile(@Request() req) {
-        return req.user
     }
     
     @Public()
@@ -31,9 +27,9 @@ export class AuthController {
     @ApiResponse({status: 200, description: 'The created user', type: User})
     @ApiBody({type: NewUserDto})
     @Post('register')
-    async registerUser(@Body() newUserDto: NewUserDto & {roles?: string[]}) {
+    async registerUser(@Body() newUserDto: NewUserDto & {roles?: string}) : Promise<User> {
         if (!newUserDto.roles || newUserDto.roles.length === 0){
-            newUserDto.roles = ['user'];
+            newUserDto.roles = 'user';
         }
         return this.authService.create(newUserDto)
     }
