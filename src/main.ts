@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api/v1');
   const config = new DocumentBuilder()
     .setTitle('Star Wars API Documentation')
     .setDescription('Star Wars API')
@@ -18,5 +19,6 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
+  console.log('TOKEN', process.env.TOKEN_EXPIRE_TIME)
 }
 bootstrap();
