@@ -18,6 +18,11 @@ $ npm run start
 $ npm run start:dev
 
 SE PUEDE ACCEDER A LA DOCUMENTACION DE SWAGGER EN LA URL: http://localhost:3000/api/v1/swagger
+
+cualquier usuario registrado se guarda con el rol de 'user'.
+Credenciales para el rol de admin:
+username: Augusto
+password: augus365
 # production mode
 $ npm run build
 $ npm run start:prod
