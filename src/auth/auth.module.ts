@@ -8,6 +8,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Role } from './entities/role-entity';
+import {config} from 'dotenv';
+config()
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { Role } from './entities/role-entity';
       JwtModule.register({
         global: true, // for not having to import it in every module
         secret: jwtConstants.secret,
-        signOptions: {expiresIn: '30m'}
+        signOptions: {expiresIn: process.env.TOKEN_EXPIRE_TIME}
       }),
       TypeOrmModule.forFeature([Role])
     ],
