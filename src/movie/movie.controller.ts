@@ -37,7 +37,7 @@ export class MovieController {
     }
     
     @Roles('admin')
-    @ApiOperation({summary: 'Update movie by episode id'})
+    @ApiOperation({summary: 'Update movie by id'})
     @ApiResponse({status: 200, description: 'Movie updated successfully'})
     @ApiResponse({status: 401, description: 'Not authorized for this method'})
     @ApiBearerAuth('access-token')  

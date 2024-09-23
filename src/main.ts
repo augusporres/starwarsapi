@@ -16,7 +16,10 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/v1/swagger', app, document);
+//   SwaggerModule.setup('api/v1/swagger', app, document);
+  SwaggerModule.setup('api/v1/swagger', app, document, {
+    swaggerUrl: 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/',
+  });
 
   await app.listen(process.env.PORT || 3000);
 }
