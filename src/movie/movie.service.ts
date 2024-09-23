@@ -21,18 +21,21 @@ export class MovieService {
     async findAll(): Promise<GetMovieDto[]> {
         const movies = await this.movieRepository.find();
         return movies.map(movie => plainToInstance(GetMovieDto, {
+            id: movie.id,
             title: movie.title,
             episodeId: movie.episodeId,
             director: movie.director,
             releaseDate: movie.releaseDate,
         }));
     }
-    async findByEpisode(episode: number): Promise<GetMovieDetailDto> {
-        const movie =  await this.movieRepository.findOneBy({episodeId: episode});
+    async findById(id: number): Promise<GetMovieDetailDto> {
+        const movie =  await this.movieRepository.findOneBy({id: id});
         if (!movie) {
-            throw new NotFoundException(`Movie with episode ${episode} not found`);
+            throw new NotFoundException(`Movie with id ${id} not found`);
         }
-        return plainToInstance(GetMovieDto, {
+        
+        return plainToInstance(GetMovieDetailDto, {
+            id: movie.id,
             title: movie.title,
             episodeId: movie.episodeId,
             director: movie.director,
@@ -57,7 +60,11 @@ export class MovieService {
             }))
             console.log('movies', movies)
             for (const movie of movies){
-                const movieFromDb = await this.movieRepository.findOneBy({ episodeId: movie.episode }); // find by episodeId
+                const movieFromDb = await this.movieRepository.findOneBy({ 
+                    episodeId: movie.episode,
+                    title: movie.title,
+                    director: movie.director
+                }); // find by episodeId
                 if(movieFromDb) {
 
                     Object.assign(movieFromDb, {
@@ -84,10 +91,10 @@ export class MovieService {
         }
     }
 
-    async updateByEpisode(episode: number, movie: UpdateMovieDto): Promise<UpdateMovieDto> {
-        let movieFromDb = await this.movieRepository.findOneBy({episodeId: episode});
+    async updateById(id: number, movie: UpdateMovieDto): Promise<UpdateMovieDto> {
+        let movieFromDb = await this.movieRepository.findOneBy({id: id});
         if(! movieFromDb) {
-            throw new NotFoundException(`Movie with episode ${episode} not found`);
+            throw new NotFoundException(`Movie with id ${id} not found`);
         }
         Object.assign(movieFromDb, movie);
 
@@ -99,10 +106,10 @@ export class MovieService {
             releaseDate: updatedMovie.releaseDate,
         } as UpdateMovieDto;
     }
-    async deleteByEpisode(episode: number): Promise<string> {
-        let deletedMovie = await this.movieRepository.delete({episodeId: episode});
+    async deleteById(id: number): Promise<string> {
+        let deletedMovie = await this.movieRepository.delete({id: id});
         if( deletedMovie.affected === 0) {
-            throw new NotFoundException(`Movie with episode ${episode} not found`);
+            throw new NotFoundException(`Movie with id ${id} not found`);
         }
         return "Movie successfully deleted";
     }

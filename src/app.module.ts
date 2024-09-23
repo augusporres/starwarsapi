@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserController } from './user/user.controller';
 import { MovieController } from './movie/movie.controller';
 import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
@@ -23,7 +22,7 @@ import { dataSourceOptions } from './db/data-source';
       ),
     AuthModule, UserModule,  MovieModule
   ],
-  controllers: [AppController, UserController,  AuthController, MovieController],
+  controllers: [AppController,  AuthController, MovieController],
   providers: [AppService],
 })
 export class AppModule {}

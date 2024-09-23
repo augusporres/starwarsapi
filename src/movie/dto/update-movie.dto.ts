@@ -5,6 +5,8 @@ export class UpdateMovieDto {
     title?: string;
     @ApiProperty({example: 'George Lucas', description: 'The movie director', required: false})
     director?: string;
+    @ApiProperty({example: 4, description: 'The movie episode', required: false})
+    episodeId?: number;
     @ApiProperty({example: '1977-05-25', description: 'The release date', required: false})
     releaseDate?: Date;
 }

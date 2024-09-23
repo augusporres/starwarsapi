@@ -22,7 +22,9 @@ export class MovieController {
     @ApiBody({type: CreateMovieDto})
     @Post('create')
     async createMovie(@Body() movie: CreateMovieDto) {
-        return this.movieService.create(movie);
+        const response =  await this.movieService.create(movie);
+        delete response.id
+        return response;
     }
     
     @Roles('admin', 'user')
@@ -39,12 +41,12 @@ export class MovieController {
     @ApiResponse({status: 200, description: 'Movie updated successfully'})
     @ApiResponse({status: 401, description: 'Not authorized for this method'})
     @ApiBearerAuth('access-token')  
-    @Put('update/:episode')
-    async updateMovieByEpisode(
-        @Param('episode') episode: number,
+    @Put('update/:id')
+    async updateMovieById(
+        @Param('id') id: number,
         @Body() updateMovieDto: UpdateMovieDto
     ): Promise<UpdateMovieDto> {
-        return this.movieService.updateByEpisode(episode, updateMovieDto);
+        return this.movieService.updateById(id, updateMovieDto);
     }
     @Roles('admin')
     @ApiOperation({summary: 'Update movies from API'})
@@ -58,22 +60,23 @@ export class MovieController {
 
     
     @Roles('user')
-    @ApiOperation({summary: 'Get specific movie details by episode id'})
+    @ApiOperation({summary: 'Get specific movie details by id'})
     @ApiBearerAuth('access-token')
     @ApiResponse({status: 200, description: 'The queried movie details', type: GetMovieDetailDto})
-    @Get(':episode')
-    async getMovieByTitle(@Param('episode') episode: number): Promise<GetMovieDetailDto> {
-        return this.movieService.findByEpisode(episode);
+    @ApiResponse({status: 404, description: 'The queried movie was not found'})
+    @Get(':id')
+    async getMovieById(@Param('id') id: number): Promise<GetMovieDetailDto> {
+        return this.movieService.findById(id);
         
     }
     
     @Roles('admin')
-    @ApiOperation({summary: 'Delete movie by episode'})
+    @ApiOperation({summary: 'Delete movie by id'})
     @ApiBearerAuth('access-token')
     @ApiResponse({status: 200, description: 'The movie was deleted successfully'})
-    @Delete(':episode')
-    async deleteMovieByEpisode(@Param('episode') episode: number): Promise<string> {
-        return this.movieService.deleteByEpisode(episode);
+    @Delete(':id')
+    async deleteMovieById(@Param('id') id: number): Promise<string> {
+        return this.movieService.deleteById(id);
         
     }
 }

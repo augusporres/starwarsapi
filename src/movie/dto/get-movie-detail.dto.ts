@@ -1,6 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
 export class GetMovieDetailDto {
+    @ApiProperty({example: 1, description: 'The movie id', type: Number})
+    id: number;
     @ApiProperty({example: 'The revenge of the siths', description: 'The movie title'})
     title: string;
     @ApiProperty({example: '4', description: 'The episode number'})
